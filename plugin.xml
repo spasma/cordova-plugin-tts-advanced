@@ -4,14 +4,14 @@
   xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
   id="cordova-plugin-tts"
-  version="0.2.3">
+  version="0.3.0">
   <name>TTS</name>
-  <description>Cordova Text-to-Speech Plugin</description>
-  <author>VILIC VANE</author>
+  <description>Cordova Text-to-Speech Plugin 2</description>
+  <author>Sebastiaan Pasma and VILIC VANE</author>
   <license>MIT</license>
   <keywords>cordova,tts,text-to-speech</keywords>
-  <repo>https://github.com/vilic/cordova-plugin-tts.git</repo>
-  <issue>https://github.com/vilic/cordova-plugin-tts/issues</issue>
+  <repo>https://github.com/spasma/cordova-plugin-tts-2.git</repo>
+  <issue>https://github.com/spasma/cordova-plugin-tts-2/issues</issue>
 
   <js-module src="www/tts.js" name="tts">
     <clobbers target="TTS" />

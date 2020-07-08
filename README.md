@@ -1,15 +1,20 @@
-# Cordova Text-to-Speech Plugin
+# Cordova Text-to-Speech Plugin 2
+Updated Cordova Text-to-Speech plugin, with support for voiceURI's returned by for ex. Javascript's SpeechSynthesis.getVoices() call.
+
+## Breaking changes with VILIC VANE version
+In this tts plugin you'll need to provide the 'cancel' argument if you want to cancel earlier TTS commands. To keep old behaviour add: `{cancel: true}` to every call.
+If no locale is provided, it will use the OS default language. to keep old behaviour, add: `{locale: en-US}` to every call. 
+No support for Windows Phone, because it is no more..
 
 ## Platforms
 
 iOS 7+  
-Windows Phone 8  
 Android 4.0.3+ (API Level 15+)
 
 ## Installation
 
 ```sh
-cordova plugin add cordova-plugin-tts
+cordova plugin add cordova-plugin-tts-2
 ```
 
 ## Usage
@@ -29,8 +34,10 @@ document.addEventListener('deviceready', function () {
     TTS
         .speak({
             text: 'hello, world!',
-            locale: 'en-GB',
-            rate: 0.75
+            locale: 'en-US',
+            rate: 0.75,
+            pitch: 0.9,
+            cancel: true
         }).then(function () {
             alert('success');
         }, function (reason) {
@@ -46,12 +53,16 @@ declare namespace TTS {
     interface IOptions {
         /** text to speak */
         text: string;
-        /** a string like 'en-US', 'zh-CN', etc */
+        /** a voice URI **/
+        voiceURI?: string;
+        /** a string like 'en-US', 'zh-CN', etc [only used when no voiceURI is given] */
         locale?: string;
         /** speed rate, 0 ~ 1 */
         rate?: number;
-        /** ambient(iOS) */
-        category?: string;
+        /** pitch, 0 ~ 1 */
+        pitch?: number;
+        /** cancel, boolean: true/false */
+        cancel?: boolean;
     }
 
     function speak(options: IOptions): Promise<void>;
