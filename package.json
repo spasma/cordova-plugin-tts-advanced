@@ -1,5 +1,5 @@
 {
-    "name": "cordova-plugin-tts",
+    "name": "cordova-plugin-tts-2",
     "version": "0.3.0",
     "description": "Updated Cordova Text-to-Speech Plugin",
     "cordova": {
@@ -21,7 +21,7 @@
         "cordova-ios",
         "cordova-android"
     ],
-    "author": "VILIC VANE & Sebastiaan Pasma",
+    "author": "Sebastiaan Pasma <sebastiaan@enkodo.nl>, VILIC VANE",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/spasma/cordova-plugin-tts-2/issues"
