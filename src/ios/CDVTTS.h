@@ -20,4 +20,5 @@
 - (void)speak:(CDVInvokedUrlCommand*)command;
 - (void)stop:(CDVInvokedUrlCommand*)command;
 - (void)checkLanguage:(CDVInvokedUrlCommand*)command;
+- (void)getVoices:(CDVInvokedUrlCommand*)command;
 @end

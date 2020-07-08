@@ -4,6 +4,9 @@
  
     by VILIC VANE
     https://github.com/vilic
+
+    updated by SEBASTIAAN PASMA
+    https://github.com/spasma
  
     MIT License
 */
@@ -30,66 +33,66 @@
     }
     
     [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient 
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient
       withOptions: 0 error: nil];
     [[AVAudioSession sharedInstance] setActive:YES withOptions: 0 error:nil];
 }
 
 - (void)speak:(CDVInvokedUrlCommand*)command {
-    
-    NSDictionary* options = [command.arguments objectAtIndex:0];
-    
-    NSString* text = [options objectForKey:@"text"];
-    NSString* locale = [options objectForKey:@"locale"];
-    double rate = [[options objectForKey:@"rate"] doubleValue];
-    NSString* category = [options objectForKey:@"category"];
-    
-    [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    if ([category isEqualToString:@"ambient"]) {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient
-                                         withOptions:0 error:nil];
-    } else {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
-                                         withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
-    }
-
     if (callbackId) {
         lastCallbackId = callbackId;
     }
-    
+
     callbackId = command.callbackId;
-    
-    [synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
-    
+    [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+        withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
+
     NSDictionary* options = [command.arguments objectAtIndex:0];
-    
+
     NSString* text = [options objectForKey:@"text"];
+    NSString* voiceURI = [options objectForKey:@"voiceURI"];
     NSString* locale = [options objectForKey:@"locale"];
+    bool cancel = [[options objectForKey:@"cancel"] boolValue];
     double rate = [[options objectForKey:@"rate"] doubleValue];
     double pitch = [[options objectForKey:@"pitch"] doubleValue];
-    
-    if (!locale || (id)locale == [NSNull null]) {
-        locale = @"en-US";
-    }
-    
+    double volume = [[options objectForKey:@"volume"] doubleValue];
+
     if (!rate) {
-        rate = 1.0;
+        rate = AVSpeechUtteranceDefaultSpeechRate;
+        NSLog(@"TTS: No rate set, so we're using OS default: '%lf'", (double)rate);
     }
-    
     if (!pitch) {
-        pitch = 1.2;
+        pitch = 1.0;
     }
-    
+    if (!volume) {
+        volume = 1.0;
+    }
+    if (cancel == true) {
+        NSLog(@"TTS: Cancel any speaking TTS-voices!");
+        [synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+    }
+
     AVSpeechUtterance* utterance = [[AVSpeechUtterance new] initWithString:text];
-    utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:locale];
-    // Rate expression adjusted manually for a closer match to other platform.
-    utterance.rate = (AVSpeechUtteranceMinimumSpeechRate * 1.5 + AVSpeechUtteranceDefaultSpeechRate) / 2.25 * rate * rate;
-    // workaround for https://github.com/vilic/cordova-plugin-tts/issues/21
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0) {
-       utterance.rate = utterance.rate * 2;
-       // see http://stackoverflow.com/questions/26097725/avspeechuterrance-speed-in-ios-8
+    if (!voiceURI || (id)voiceURI == [NSNull null]) {
+        NSString * defaultOSLocale = [[NSLocale preferredLanguages] firstObject];
+        if (!locale) {
+            // No local given, let's get default locale from OS
+            locale = defaultOSLocale;
+            NSLog(@"TTS: No locale given so use: %@", locale);
+        } else {
+            NSLog(@"TTS: locale set, so let's hope that '%@' is a valid locale", locale);
+        }
+        AVSpeechSynthesisVoice* voice = [AVSpeechSynthesisVoice voiceWithLanguage:locale];
+        NSLog(@"TTS: We have found a voice: Name: %@, Identifier: %@, Quality: %ld", voice.name, voice.identifier, (long)voice.quality);
+        utterance.voice = voice;
+    } else {
+        utterance.voice = [AVSpeechSynthesisVoice voiceWithIdentifier:voiceURI];
+        NSLog(@"TTS: Tried to get voice by VoiceURI, this is what we got: Name: %@, Identifier: %@, Quality: %ld", utterance.voice.name, utterance.voice.identifier, (long)utterance.voice.quality);
     }
+    utterance.rate = rate;
     utterance.pitchMultiplier = pitch;
+    utterance.volume = volume;
     [synthesizer speakUtterance:utterance];
 }
 
@@ -110,6 +113,17 @@
     }
 
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:languages];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)getVoices:(CDVInvokedUrlCommand*)command {
+    NSArray *allVoices = [AVSpeechSynthesisVoice speechVoices];
+
+    for (AVSpeechSynthesisVoice *voice in allVoices) {
+        NSLog(@"TTS: Voice Name: %@, Identifier: %@, Quality: %ld", voice.name, voice.identifier, (long)voice.quality);
+    }
+
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:allVoices];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 @end
