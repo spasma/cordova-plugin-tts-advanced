@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "description": "Updated Cordova Text-to-Speech Plugin",
     "cordova": {
-        "id": "cordova-plugin-tts",
+        "id": "cordova-plugin-tts-2",
         "platforms": [
             "ios",
             "android"
@@ -11,7 +11,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/rawian/cordova-plugin-tts.git"
+        "url": "git+https://github.com/spasma/cordova-plugin-tts-2.git"
     },
     "keywords": [
         "cordova",
