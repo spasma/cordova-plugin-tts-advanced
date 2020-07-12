@@ -168,9 +168,13 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         boolean cancel;
         String voiceURI;
 
-        if (params.isNull("cancel") || cancel == true) {
-            tts.shutdown();
+        if (!params.isNull("cancel")) {
+            cancel = params.getBoolean("cancel");
+            if (cancel) {
+                tts.shutdown();
+            }
         }
+
 
         if (params.isNull("text")) {
             callbackContext.error(ERR_INVALID_OPTIONS);
@@ -183,6 +187,15 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             locale = Locale.getDefault().toLanguageTag();
         } else {
             locale = params.getString("locale");
+        }
+
+        if (params.isNull("voiceURI")) {
+            voiceURI = params.getString("voiceURI");
+            for (Voice tmpVoice : tts.getVoices()) {
+                if (tmpVoice.getName().equals(voiceURI)) {
+                    tts.setVoice(tmpVoice);
+                }
+            }
         }
 
         if (params.isNull("rate")) {
@@ -218,7 +231,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         } else {
             tts.setSpeechRate((float) rate);
         }
-        tts.setPitch(pitch);
+        tts.setPitch((float)pitch);
 
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, ttsParams);
     }
