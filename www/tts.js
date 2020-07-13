@@ -11,33 +11,39 @@
 */
 
 exports.speak = function (text) {
-    return new Promise(function (resolve, reject) {
-        var options = {};
+  return new Promise(function (resolve, reject) {
+    var options = {};
 
-        if (typeof text == 'string') {
-            options.text = text;
-        } else {
-            options = text;
-        }
+    if (typeof text == "string") {
+      options.text = text;
+    } else {
+      options = text;
+    }
 
-        cordova.exec(resolve, reject, 'TTS', 'speak', [options]);
-    });
+    cordova.exec(resolve, reject, "TTS", "speak", [options]);
+  });
 };
 
-exports.stop = function() {
-    return new Promise(function (resolve, reject) {
-        cordova.exec(resolve, reject, 'TTS', 'stop', []);
-    });
+exports.stop = function () {
+  return new Promise(function (resolve, reject) {
+    cordova.exec(resolve, reject, "TTS", "stop", []);
+  });
 };
 
-exports.checkLanguage = function() {
-    return new Promise(function (resolve, reject) {
-        cordova.exec(resolve, reject, 'TTS', 'checkLanguage', []);
-    });
+exports.checkLanguage = function () {
+  return new Promise(function (resolve, reject) {
+    cordova.exec(resolve, reject, "TTS", "checkLanguage", []);
+  });
 };
 
-exports.openInstallTts = function() {
-    return new Promise(function (resolve, reject) {
-        cordova.exec(resolve, reject, 'TTS', 'openInstallTts', []);
-    });
+exports.getVoices = function () {
+  return new Promise(function (resolve, reject) {
+    cordova.exec(resolve, reject, "TTS", "getVoices", []);
+  });
+};
+
+exports.openInstallTts = function () {
+  return new Promise(function (resolve, reject) {
+    cordova.exec(resolve, reject, "TTS", "openInstallTts", []);
+  });
 };

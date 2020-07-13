@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.speech.tts.Voice;
+import android.util.Log;
 
 /*
     Cordova Text-to-Speech Plugin
@@ -114,12 +115,12 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     }
 
     private void stop(JSONArray args, CallbackContext callbackContext)
-      throws JSONException, NullPointerException {
+            throws JSONException, NullPointerException {
         tts.stop();
     }
 
     private void callInstallTtsActivity(JSONArray args, CallbackContext callbackContext)
-      throws JSONException, NullPointerException {
+            throws JSONException, NullPointerException {
 
         PackageManager pm = context.getPackageManager();
         Intent installIntent = new Intent();
@@ -127,16 +128,16 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         ResolveInfo resolveInfo = pm.resolveActivity( installIntent, PackageManager.MATCH_DEFAULT_ONLY );
 
         if( resolveInfo == null ) {
-           // Not able to find the activity which should be started for this intent
+            // Not able to find the activity which should be started for this intent
         } else {
-          installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-          context.startActivity(installIntent);
+            installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(installIntent);
         }
     }
 
 
     private void checkLanguage(JSONArray args, CallbackContext callbackContext)
-      throws JSONException, NullPointerException {
+            throws JSONException, NullPointerException {
         Set<Locale> supportedLanguages = tts.getAvailableLanguages();
         String languages = "";
         if(supportedLanguages!= null) {
@@ -154,6 +155,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
     private void speak(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
+        Log.v("TTS", "Speak!");
         JSONObject params = args.getJSONObject(0);
 
         if (params == null) {
@@ -169,45 +171,57 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         String voiceURI;
 
         if (!params.isNull("cancel")) {
+            Log.v("TTS", "cancel provided");
             cancel = params.getBoolean("cancel");
             if (cancel) {
+                Log.v("TTS", "Cancel previous sound");
                 tts.shutdown();
             }
         }
-
 
         if (params.isNull("text")) {
             callbackContext.error(ERR_INVALID_OPTIONS);
             return;
         } else {
             text = params.getString("text");
+            Log.v("TTS", "text URI provided: "+text);
         }
 
         if (params.isNull("locale")) {
+            Log.v("TTS", "No locale provided");
             locale = Locale.getDefault().toLanguageTag();
         } else {
             locale = params.getString("locale");
+            Log.v("TTS", "locale URI provided: "+locale);
         }
 
         if (params.isNull("voiceURI")) {
             voiceURI = params.getString("voiceURI");
+            Log.v("TTS", "voice URI provided: "+voiceURI);
             for (Voice tmpVoice : tts.getVoices()) {
                 if (tmpVoice.getName().equals(voiceURI)) {
+                    Log.v("TTS", "found the voice: "+voiceURI);
                     tts.setVoice(tmpVoice);
+                } else {
+                    Log.v("TTS", tmpVoice.getName()+" is not the voice w'ere looking for");
                 }
             }
         }
 
         if (params.isNull("rate")) {
             rate = 1.0;
+            Log.v("TTS", "No rate provided, so rate is set to "+rate);
         } else {
             rate = params.getDouble("rate");
+            Log.v("TTS", "rate is set to "+rate);
         }
 
         if (params.isNull("pitch")) {
             pitch = 1.0;
+            Log.v("TTS", "No pitch provided, so pitch set to "+pitch);
         } else {
             pitch = params.getDouble("pitch");
+            Log.v("TTS", "Pitch set to "+pitch);
         }
 
         if (tts == null) {
