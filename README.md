@@ -1,10 +1,13 @@
 # Cordova Text-to-Speech Plugin Advanced
-Updated Cordova Text-to-Speech plugin, with support for voiceURI's returned by for ex. Javascript's SpeechSynthesis.getVoices() call.
+Updated Cordova Text-to-Speech plugin, with support for voices on android by locale.
 
 ## Breaking changes with VILIC VANE version
-In this tts plugin you'll need to provide the 'cancel' argument if you want to cancel earlier TTS commands. To keep old behaviour add: `{cancel: true}` to every call.
-If no locale is provided, it will use the OS default language. to keep old behaviour, add: `{locale: en-US}` to every call. 
-No support for Windows Phone, because it is no more..
+In this tts plugin you'll need to provide the 'cancel' argument if you want to cancel earlier TTS commands, new lines are added to the queue. 
+To keep old behaviour add: `{cancel: true}` to every call.
+
+If no locale is provided, it will use the OS default language. to keep old behaviour, add: `{locale: 'en-US'}` to every call. 
+
+Support for Windows Phone was removed, because it is no more..
 
 ## Platforms
 

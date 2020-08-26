@@ -58,7 +58,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     @Override
     public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
         context = cordova.getActivity().getApplicationContext();
-        tts = new TextToSpeech(cordova.getActivity().getApplicationContext(), this);
+        tts = new TextToSpeech(cordova.getActivity().getApplicationContext(), this, "com.google.android.tts");
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {
@@ -174,12 +174,8 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         String locale;
         double rate;
         double pitch;
-        boolean cancel;
+        boolean cancel = false;
         String voiceURI;
-
-        if (params.isNull("cancel")) {
-            tts.stop();
-        }
 
         if (params.isNull("text")) {
             callbackContext.error(ERR_INVALID_OPTIONS);
@@ -193,6 +189,11 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         } else {
             locale = params.getString("locale");
         }
+
+        if (!params.isNull("cancel")) {
+            cancel = params.getBoolean("cancel");
+        }
+        Log.v("TTS", "cancel is set to "+cancel+ "("+(cancel?"TextToSpeech.QUEUE_FLUSH":"TextToSpeech.QUEUE_ADD")+")");
 
         if (params.isNull("rate")) {
             rate = 1.0;
@@ -226,8 +227,20 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         String[] localeArgs = locale.split("-");
         System.out.println(localeArgs[0]);
         System.out.println(localeArgs[1]);
-
         tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
+
+        Voice voice = null;
+        Set<Voice> voices = tts.getVoices();
+        for (Voice tmpVoice : tts.getVoices()) {
+            if (tmpVoice.getName().toLowerCase().contains(locale.toLowerCase())) {
+                Log.v("TTS", "Found Voice for locale: "+tmpVoice.getName());
+                voice = tmpVoice;
+                break;
+            }
+            else {
+                voice = null;
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= 27) {
             tts.setSpeechRate((float) rate * 0.7f);
@@ -237,11 +250,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         tts.setPitch((float)pitch);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,null);
+            tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null,null);
         } else {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null);
         }
-    }
 
     private void getVoices(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
