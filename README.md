@@ -1,4 +1,4 @@
-# Cordova Text-to-Speech Plugin 2
+# Cordova Text-to-Speech Plugin Advanced
 Updated Cordova Text-to-Speech plugin, with support for voiceURI's returned by for ex. Javascript's SpeechSynthesis.getVoices() call.
 
 ## Breaking changes with VILIC VANE version
@@ -14,7 +14,7 @@ Android 4.0.3+ (API Level 15+)
 ## Installation
 
 ```sh
-cordova plugin add cordova-plugin-tts-2
+cordova plugin add cordova-plugin-tts-advanced
 ```
 
 ## Usage
