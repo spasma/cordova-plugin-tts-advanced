@@ -29,21 +29,6 @@
     <source-file src="src/ios/CDVTTS.m" />
   </platform>
 
-  <!-- windows phone 8 -->
-  <platform name="wp8">
-    <config-file target="config.xml" parent="/*">
-      <feature name="TTS">
-        <param name="wp-package" value="TTS"/>
-      </feature>
-    </config-file>
-
-    <config-file target="Properties/WMAppManifest.xml" parent="/*/App/Capabilities">
-      <Capability Name="ID_CAP_SPEECH_RECOGNITION" />
-    </config-file>
-  
-    <source-file src="src/wp/TTS.cs" />
-  </platform>
-
   <!-- android -->
   <platform name="android">
     <config-file target="config.xml" parent="/*">
