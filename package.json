@@ -11,7 +11,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/spasma/cordova-plugin-tts-2.git"
+        "url": "git+https://github.com/spasma/cordova-plugin-tts-advanced.git"
     },
     "keywords": [
         "cordova",
@@ -24,7 +24,7 @@
     "author": "Sebastiaan Pasma <sebastiaan@enkodo.nl>, VILIC VANE",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/spasma/cordova-plugin-tts-2/issues"
+        "url": "https://github.com/spasma/cordova-plugin-tts-advanced/issues"
     },
-    "homepage": "https://github.com/spasma/cordova-plugin-tts-2#readme"
+    "homepage": "https://github.com/spasma/cordova-plugin-tts-advanced#readme"
 }
