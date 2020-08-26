@@ -254,7 +254,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         } else {
             tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null);
         }
-
+    }
     private void getVoices(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
 
