@@ -3,7 +3,7 @@
 <plugin
   xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
-  id="cordova-plugin-tts"
+  id="cordova-plugin-tts-advanced"
   version="0.3.0">
   <name>TTS</name>
   <description>Cordova Text-to-Speech Plugin 2</description>
