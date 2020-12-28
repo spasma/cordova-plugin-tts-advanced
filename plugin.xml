@@ -4,9 +4,9 @@
   xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
   id="cordova-plugin-tts-advanced"
-  version="0.4.1">
+  version="0.4.2">
   <name>TTS</name>
-  <description>Cordova Text-to-Speech Plugin 2</description>
+  <description>Cordova Text-to-Speech Plugin Advanced</description>
   <author>Sebastiaan Pasma and VILIC VANE</author>
   <license>MIT</license>
   <keywords>cordova,tts,text-to-speech</keywords>
