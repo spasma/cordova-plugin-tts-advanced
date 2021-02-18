@@ -92,6 +92,8 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             stop(args, callbackContext);
         } else if (action.equals("checkLanguage")) {
             checkLanguage(args, callbackContext);
+        } else if (action.equals("getVoices")) {
+            getVoices(args, callbackContext);
         } else if (action.equals("openInstallTts")) {
             callInstallTtsActivity(args, callbackContext);
         } else {
@@ -175,13 +177,21 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         double rate;
         double pitch;
         boolean cancel = false;
-        String voiceURI;
+        String identifier;
 
         if (params.isNull("text")) {
             callbackContext.error(ERR_INVALID_OPTIONS);
             return;
         } else {
             text = params.getString("text");
+        }
+
+        if (params.isNull("identifier")) {
+            identifier = "";
+            Log.v("TTS", "No voice identifier");
+        } else {
+            identifier = params.getString("identifier");
+            Log.v("TTS", "got identifier: "+identifier);
         }
 
         if (params.isNull("locale")) {
@@ -223,23 +233,42 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
         HashMap<String, String> ttsParams = new HashMap<String, String>();
         ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, callbackContext.getCallbackId());
-
-        String[] localeArgs = locale.split("-");
-        System.out.println(localeArgs[0]);
-        System.out.println(localeArgs[1]);
-        tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
-
-        Voice voice = null;
         Set<Voice> voices = tts.getVoices();
-        for (Voice tmpVoice : tts.getVoices()) {
-            if (tmpVoice.getName().toLowerCase().contains(locale.toLowerCase())) {
-                Log.v("TTS", "Found Voice for locale: "+tmpVoice.getName());
-                voice = tmpVoice;
-                break;
+        Voice voice = null;
+
+        if (!identifier.equals("")) {
+            for (Voice tmpVoice : voices) {
+                if (tmpVoice.getName().contains(identifier)) {
+                    Log.v("TTS", "Found Voice for identifier: " + tmpVoice.getName());
+                    voice = tmpVoice;
+                    break;
+                } else {
+                    voice = null;
+                }
             }
-            else {
-                voice = null;
+            if (voice == null) {
+                Log.v("TTS", "No Voice for identifier: "+identifier+", we'll try the locale");
             }
+        }
+        if (voice == null) {
+            String[] localeArgs = locale.split("-");
+            tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
+            for (Voice tmpVoice : voices) {
+                if (tmpVoice.getName().toLowerCase().contains(locale.toLowerCase())) {
+                    Log.v("TTS", "Found Voice for locale: " + tmpVoice.getName());
+                    voice = tmpVoice;
+                    break;
+                } else {
+                    voice = null;
+                }
+            }
+        }
+
+        if (voice != null) {
+            Log.v("TTS", "We've got a voice: "+voice.getName());
+            tts.setVoice(voice);
+        } else {
+            Log.v("TTS", "No voice found..");
         }
 
         if (Build.VERSION.SDK_INT >= 27) {
@@ -258,25 +287,18 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     private void getVoices(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
 
-        Voice voice = null;
-
         Set<Voice> voices = tts.getVoices();
-        for (Voice tmpVoice : tts.getVoices()) {
+        JSONArray languages = new JSONArray();
+        for (Voice tmpVoice : voices) {
+            JSONObject lang = new JSONObject();
             Log.v("TTS", "Voice: "+tmpVoice.getName());
-            if (tmpVoice.getName().contains("#male") && tmpVoice.getName().contains("en-us")) {
-                voice = tmpVoice;
-                break;
-            }
-            else {
-                voice = null;
-            }
-        }
-        if (voice != null) {
-            tts.setVoice(voice);
+            lang.put("name", tmpVoice.getName());
+            lang.put("identifier", tmpVoice.getName());
+            lang.put("language", tmpVoice.getLocale());
+            languages.put(lang);
         }
 
-
-        final PluginResult result = new PluginResult(PluginResult.Status.OK, "done");
+        final PluginResult result = new PluginResult(PluginResult.Status.OK, languages);
         callbackContext.sendPluginResult(result);
     }
 }
