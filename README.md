@@ -1,5 +1,5 @@
 # Cordova Text-to-Speech Plugin Advanced
-Updated Cordova Text-to-Speech plugin, with support for voices on android by locale and VoiceURI on iOS.
+Updated Cordova Text-to-Speech plugin, with support for voice or locale on both iOS and Android.
 
 ## Breaking changes with VILIC VANE version
 In this tts plugin you'll need to provide the 'cancel' argument if you want to cancel earlier TTS commands, new lines are added to the queue. 
