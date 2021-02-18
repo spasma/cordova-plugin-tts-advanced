@@ -52,6 +52,7 @@
 
     NSString* text = [options objectForKey:@"text"];
     NSString* voiceURI = [options objectForKey:@"voiceURI"];
+    NSString* identifier = [options objectForKey:@"identifier"];
     NSString* locale = [options objectForKey:@"locale"];
     bool cancel = [[options objectForKey:@"cancel"] boolValue];
     double rate = [[options objectForKey:@"rate"] doubleValue];
@@ -74,6 +75,11 @@
     }
 
     AVSpeechUtterance* utterance = [[AVSpeechUtterance new] initWithString:text];
+
+    if (identifier) { // TODO SP: use identifier for both Android & iOS
+        voiceURI = identifier;
+    }
+
     if (!voiceURI || (id)voiceURI == [NSNull null]) {
         NSString * defaultOSLocale = [[NSLocale preferredLanguages] firstObject];
         if (!locale) {
@@ -118,12 +124,15 @@
 
 - (void)getVoices:(CDVInvokedUrlCommand*)command {
     NSArray *allVoices = [AVSpeechSynthesisVoice speechVoices];
+    NSMutableArray *res = [[NSMutableArray alloc] init];
 
     for (AVSpeechSynthesisVoice *voice in allVoices) {
         NSLog(@"TTS: Voice Name: %@, Identifier: %@, Quality: %ld", voice.name, voice.identifier, (long)voice.quality);
+        NSDictionary *lang = @{@"language": voice.language, @"name": voice.name, @"identifier": voice.identifier, @"voiceURI": voice.identifier};
+        [res addObject:lang];
     }
 
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:allVoices];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:res];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 @end
