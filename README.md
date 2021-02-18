@@ -91,6 +91,6 @@ declare namespace TTS {
     function stop(): Promise<void>;
     function checkLanguage(): Promise<string>;
     function openInstallTts(): Promise<void>;
-    function getVoices(): Promise<TTSVoice>;
+    function getVoices(): Promise<TTSVoice[]>;
 }
 ```
