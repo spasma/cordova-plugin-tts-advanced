@@ -33,7 +33,7 @@
     }
     
     [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error: nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error: nil];
     [[AVAudioSession sharedInstance] setActive:YES withOptions: 0 error:nil];
 }
 
@@ -59,7 +59,7 @@
 
     callbackId = command.callbackId;
     [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
     
     NSDictionary* options = [command.arguments objectAtIndex:0];
 
