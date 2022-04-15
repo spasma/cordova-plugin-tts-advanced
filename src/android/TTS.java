@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
+import android.media.AudioManager;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -96,6 +97,16 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             getVoices(args, callbackContext);
         } else if (action.equals("openInstallTts")) {
             callInstallTtsActivity(args, callbackContext);
+        } else if (action.equals("setSpeaker")) {
+            if (!setAudioMode("speaker")) {
+                callbackContext.error("Invalid audio mode");
+                return false;
+            }
+        } else if( action.equals("setEarpiece")){
+            if (!setAudioMode("earpiece")) {
+                callbackContext.error("Invalid audio mode");
+                return false;
+            }
         } else {
             return false;
         }
@@ -231,6 +242,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             return;
         }
 
+        if (!params.isNull("earpiece") && params.getBoolean("earpiece") == true) {
+            setAudioMode("earpiece");
+        }
+
         HashMap<String, String> ttsParams = new HashMap<String, String>();
         ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, callbackContext.getCallbackId());
         Set<Voice> voices = tts.getVoices();
@@ -301,4 +316,34 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         final PluginResult result = new PluginResult(PluginResult.Status.OK, languages);
         callbackContext.sendPluginResult(result);
     }
+
+    public boolean setAudioMode(String mode) {
+        final Context context = webView.getContext();
+        final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+        Log.v("TTS", "Setting audio output into " + earpiece);
+
+        if (mode.equals("earpiece")) {
+            if(!audioManager.isSpeakerphoneOn())
+                return true;
+
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            audioManager.stopBluetoothSco();
+            audioManager.setBluetoothScoOn(false);
+            audioManager.setSpeakerphoneOn(false);
+            return true;
+        } else if (mode.equals("speaker")) {
+            if(audioManager.isSpeakerphoneOn())
+                return true;
+
+            audioManager.setMode(AudioManager.MODE_NORMAL);
+            audioManager.stopBluetoothSco();
+            audioManager.setBluetoothScoOn(false);
+            audioManager.setSpeakerphoneOn(true);
+            return true;
+        }
+
+        return false;
+    }
+
 }

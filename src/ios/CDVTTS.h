@@ -17,6 +17,8 @@
     NSString* callbackId;
 }
 
+- (void)setSpeaker:(CDVInvokedUrlCommand*)command;
+- (void)setEarpiece:(CDVInvokedUrlCommand*)command;
 - (void)speak:(CDVInvokedUrlCommand*)command;
 - (void)stop:(CDVInvokedUrlCommand*)command;
 - (void)checkLanguage:(CDVInvokedUrlCommand*)command;
