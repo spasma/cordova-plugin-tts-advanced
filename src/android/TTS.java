@@ -321,7 +321,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         final Context context = webView.getContext();
         final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-        Log.v("TTS", "Setting audio output into " + earpiece);
+        Log.v("TTS", "Setting audio output into " + mode);
 
         if (mode.equals("earpiece")) {
             if(!audioManager.isSpeakerphoneOn())
