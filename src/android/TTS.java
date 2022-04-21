@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
@@ -188,6 +189,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         double rate;
         double pitch;
         boolean cancel = false;
+        boolean earpiece = false;
         String identifier;
 
         if (params.isNull("text")) {
@@ -242,8 +244,8 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             return;
         }
 
-        if (!params.isNull("earpiece") && params.getBoolean("earpiece") == true) {
-            setAudioMode("earpiece");
+        if(!params.isNull("earpiece")){
+            earpiece = params.getBoolean("earpiece");
         }
 
         HashMap<String, String> ttsParams = new HashMap<String, String>();
@@ -293,10 +295,18 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         }
         tts.setPitch((float)pitch);
 
+        Bundle bundle = new Bundle();
+        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_VOICE_CALL);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null,callbackContext.getCallbackId());
+            tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD, bundle, callbackContext.getCallbackId());
         } else {
             tts.speak(text,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,ttsParams);
+        }
+
+        if(earpiece && !cancel){
+            Log.v("TTS", "Output mode is" + (earpiece ? "earpiece" : "speaker"));
+            setAudioMode("earpiece");
         }
     }
     private void getVoices(JSONArray args, CallbackContext callbackContext)
@@ -318,28 +328,23 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     }
 
     public boolean setAudioMode(String mode) {
-        final Context context = webView.getContext();
         final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-
-        Log.v("TTS", "Setting audio output into " + mode);
 
         if (mode.equals("earpiece")) {
             if(!audioManager.isSpeakerphoneOn())
                 return true;
 
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audioManager.stopBluetoothSco();
-            audioManager.setBluetoothScoOn(false);
+            Log.v("TTS", "Setting audio output into " + mode);
             audioManager.setSpeakerphoneOn(false);
+            audioManager.setBluetoothScoOn(true);
             return true;
         } else if (mode.equals("speaker")) {
             if(audioManager.isSpeakerphoneOn())
                 return true;
 
-            audioManager.setMode(AudioManager.MODE_NORMAL);
-            audioManager.stopBluetoothSco();
-            audioManager.setBluetoothScoOn(false);
+            Log.v("TTS", "Setting audio output into " + mode);
             audioManager.setSpeakerphoneOn(true);
+            audioManager.setBluetoothScoOn(false);
             return true;
         }
 
