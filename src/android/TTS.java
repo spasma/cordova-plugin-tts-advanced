@@ -58,7 +58,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     @Override
     public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
         context = cordova.getActivity().getApplicationContext();
-        tts = new TextToSpeech(cordova.getActivity().getApplicationContext(), this, "com.google.android.tts");
+        tts = new TextToSpeech(cordova.getActivity().getApplicationContext(), this);
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {
