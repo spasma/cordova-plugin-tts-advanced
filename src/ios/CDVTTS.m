@@ -33,10 +33,24 @@
     }
     
     [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient
-      withOptions: 0 error: nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error: nil];
     [[AVAudioSession sharedInstance] setActive:YES withOptions: 0 error:nil];
 }
+
+- (void)setSpeaker:(CDVInvokedUrlCommand *)command {
+    [synthesizer pauseSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+    NSLog(@"TTS: setting output into speaker");
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+    [synthesizer continueSpeaking];
+}
+
+- (void)setEarpiece:(CDVInvokedUrlCommand *)command {
+    [synthesizer pauseSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+    NSLog(@"TTS: setting output into earpiece");
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:nil];
+    [synthesizer continueSpeaking];
+}
+
 
 - (void)speak:(CDVInvokedUrlCommand*)command {
     if (callbackId) {
@@ -45,9 +59,8 @@
 
     callbackId = command.callbackId;
     [[AVAudioSession sharedInstance] setActive:NO withOptions:0 error:nil];
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
-        withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
-
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    
     NSDictionary* options = [command.arguments objectAtIndex:0];
 
     NSString* text = [options objectForKey:@"text"];
@@ -58,6 +71,14 @@
     double rate = [[options objectForKey:@"rate"] doubleValue];
     double pitch = [[options objectForKey:@"pitch"] doubleValue];
     double volume = [[options objectForKey:@"volume"] doubleValue];
+    bool earpiece = [[options objectForKey:@"earpiece"] boolValue];
+
+    if (earpiece == true){
+        NSLog(@"TTS: setting output into earpiece");
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:nil];
+    } else{
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+    }
 
     if (!rate) {
         rate = AVSpeechUtteranceDefaultSpeechRate;
