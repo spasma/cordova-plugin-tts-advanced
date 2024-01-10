@@ -10,8 +10,8 @@
   <author>Sebastiaan Pasma and VILIC VANE</author>
   <license>MIT</license>
   <keywords>cordova,tts,text-to-speech</keywords>
-  <repo>https://github.com/spasma/cordova-plugin-tts-advanced.git</repo>
-  <issue>https://github.com/spasma/cordova-plugin-tts-advanced/issues</issue>
+  <repo>https://github.com/oryango/cordova-plugin-tts-advanced.git</repo>
+  <issue>https://github.com/oryango/cordova-plugin-tts-advanced/issues</issue>
 
   <js-module src="www/tts.js" name="tts">
     <clobbers target="TTS" />
