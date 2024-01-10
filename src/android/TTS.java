@@ -62,7 +62,8 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {
-                // do nothing
+                JSONObject eventData = new JSONObject();
+                sendCustomEvent("speechStart", eventData, webView, cordova);
             }
 
             @Override
@@ -78,6 +79,19 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 if (!callbackId.equals("")) {
                     CallbackContext context = new CallbackContext(callbackId, webView);
                     context.error(ERR_UNKNOWN);
+                }
+            }
+
+            @Override
+            public void onRangeStart (String utteranceId, int start, int end, int frame) {
+                try {
+                    JSONObject eventData = new JSONObject();
+                    eventData.put("charIndex", start);
+                    eventData.put("charLen", end-start);
+                    sendCustomEvent("speechBoundary", eventData, webView, cordova);
+                } catch (JSONException e) {
+                    // Handle the exception or print the stack trace
+                    e.printStackTrace();
                 }
             }
         });
@@ -300,5 +314,12 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
         final PluginResult result = new PluginResult(PluginResult.Status.OK, languages);
         callbackContext.sendPluginResult(result);
+    }
+    private void sendCustomEvent(String eventName, JSONObject eventData, CordovaWebView webView, CordovaInterface cordova) {
+        cordova.getActivity().runOnUiThread(() -> {
+            String jsonString = eventData.toString();
+            String jsCode = "javascript:cordova.fireDocumentEvent('" + eventName + "', " + jsonString + ")";
+            webView.loadUrl(jsCode);
+        });
     }
 }
